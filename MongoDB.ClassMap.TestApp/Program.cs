@@ -20,7 +20,7 @@ namespace MongoDB.ClassMap.TestApp
             var connectionString = "mongodb://localhost";
             var client = new MongoClient(connectionString);
 
-            var database = client.GetServer().GetDatabase("classMapTest"); // "test" is the name of the database
+            var database = client.GetDatabase("classMapTest"); // "test" is the name of the database
 
             var collection = database.GetCollection<MyClass>("myClass");
 
@@ -30,7 +30,7 @@ namespace MongoDB.ClassMap.TestApp
                 SomeOtherProperty = "this will be ignored"
             };
 
-            collection.Save(myClass);
+            collection.InsertOneAsync(myClass);
 
             Console.WriteLine("MyClass saved");
             Console.WriteLine("SomeProperty = " + myClass.SomeProperty);
@@ -38,7 +38,7 @@ namespace MongoDB.ClassMap.TestApp
 
             Console.WriteLine();
 
-            var item = collection.FindAll().First();
+            var item = collection.Find(_ => true).ToListAsync().Result.First();
 
             Console.WriteLine("MyClass retrieved");
             Console.WriteLine("SomeProperty = " + item.SomeProperty);
