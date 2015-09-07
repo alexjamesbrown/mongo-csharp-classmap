@@ -48,7 +48,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Data\MongoDbClassMap.cs" />
-    <Compile Include="MyClass.cs" />
     <Compile Include="Data\ClassMaps\MyClassClassMap.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
