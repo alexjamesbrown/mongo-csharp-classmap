@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using MongoDB.ClassMap.TestApp.Data;
 using MongoDB.ClassMap.TestApp.Data.ClassMaps;
 using MongoDB.ClassMap.TestApp.Domain;
@@ -17,10 +18,10 @@ namespace MongoDB.ClassMap.TestApp
 
             //now, use mongodb as you normally would -
             //not doing anything clever here / abstracting this part (yet)
-            var connectionString = "mongodb://localhost";
+            var connectionString = "mongodb://localhost:27017";
             var client = new MongoClient(connectionString);
 
-            var database = client.GetServer().GetDatabase("classMapTest"); // "test" is the name of the database
+            var database = client.GetDatabase("classMapTest"); // "test" is the name of the database
 
             var collection = database.GetCollection<MyClass>("myClass");
 
@@ -30,7 +31,8 @@ namespace MongoDB.ClassMap.TestApp
                 SomeOtherProperty = "this will be ignored"
             };
 
-            collection.Save(myClass);
+            Task t = Insert(collection, myClass);
+            t.Wait();
 
             Console.WriteLine("MyClass saved");
             Console.WriteLine("SomeProperty = " + myClass.SomeProperty);
@@ -38,13 +40,18 @@ namespace MongoDB.ClassMap.TestApp
 
             Console.WriteLine();
 
-            var item = collection.FindAll().First();
+            var item = collection.Find(_ => true).ToListAsync().Result.First();
 
             Console.WriteLine("MyClass retrieved");
             Console.WriteLine("SomeProperty = " + item.SomeProperty);
             Console.WriteLine("SomeOtherProperty = " + item.SomeOtherProperty); //this will be blank
 
             Console.Read();
+        }
+
+        private static async Task Insert(IMongoCollection<MyClass> collection, MyClass myClass)
+        {
+            await collection.InsertOneAsync(myClass);
         }
 
         private static void InitialiseMongoDatabase()
